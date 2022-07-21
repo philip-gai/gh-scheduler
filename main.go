@@ -15,19 +15,22 @@ func rootCmd() *cobra.Command {
 
 type mergeOptions struct {
 	PullUrl string
+	In      string
 }
 
 func mergeCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "merge <pull_url>",
-		Short: "Merge a pull request at the scheduled time",
-		Args:  cobra.MaximumNArgs(1),
+		Use:     "merge <pull_url> in <time_string>",
+		Short:   "Merge a pull request at a future time",
+		Example: "gh schedule merge https://github.com/philip-gai/gh-schedule/pull/1 in 10m",
+		Args:    cobra.MaximumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts := mergeOptions{}
 			if len(args) == 0 {
-				return fmt.Errorf("pull_url is required")
-			} else {
+				return fmt.Errorf("invalid arguments")
+			} else if len(args) == 3 {
 				opts.PullUrl = args[0]
+				opts.In = args[2]
 			}
 			return runMerge(opts)
 		},
@@ -35,11 +38,16 @@ func mergeCmd() *cobra.Command {
 }
 
 func runMerge(opts mergeOptions) error {
-	fmt.Printf("Merging %s\n", opts.PullUrl)
+	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
+	scheduleJob(scheduleJobOptions{
+		In:       opts.In,
+		GhCliCmd: ghCliCmd,
+	})
 	return nil
 }
 
 func main() {
+	go startScheduler()
 	rc := rootCmd()
 	rc.AddCommand(mergeCmd())
 	if err := rc.Execute(); err != nil {
