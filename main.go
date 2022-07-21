@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -38,6 +40,7 @@ func mergeCmd() *cobra.Command {
 }
 
 func runMerge(opts mergeOptions) error {
+	fmt.Printf("Scheduling merge of %s in %s", opts.PullUrl, opts.In)
 	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
 	scheduleJob(scheduleJobOptions{
 		In:       opts.In,
@@ -47,12 +50,45 @@ func runMerge(opts mergeOptions) error {
 }
 
 func main() {
-	go startScheduler()
-	rc := rootCmd()
-	rc.AddCommand(mergeCmd())
-	if err := rc.Execute(); err != nil {
-		// TODO not bothering as long as cobra is also printing error
-		//fmt.Println(err)
-		os.Exit(1)
+	startScheduler()
+
+	// TODO: Figure out how to pass stdin to cobra
+	// rc := rootCmd()
+	// rc.AddCommand(mergeCmd())
+	// if err := rc.Execute(); err != nil {
+	// 	// TODO not bothering as long as cobra is also printing error
+	// 	//fmt.Println(err)
+	// 	os.Exit(1)
+	// }
+
+	fmt.Println("Welcome to gh-schedule!")
+	fmt.Println("Available Commands:\n * merge <pull_url> in <time_string>\n * <Enter>: Exits the scheduler")
+
+	for {
+		// TODO - Press enter to exit, otherwise enter more schedule commands
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter command: ")
+		text, _ := reader.ReadString('\n')
+		if text == "\n" {
+			fmt.Println("Stopping the scheduler")
+			break
+		}
+		fmt.Println("Running command:", text)
+
+		args := strings.Split(text, " ")
+
+		if len(args) == 0 {
+			fmt.Println("Error: invalid arguments")
+		} else {
+			command := args[0]
+			if command == "merge" {
+				opts := mergeOptions{}
+				opts.PullUrl = args[1]
+				opts.In = args[3]
+				runMerge(opts)
+			} else {
+				fmt.Println("Unknown command:", command)
+			}
+		}
 	}
 }
