@@ -23,11 +23,10 @@ func scheduleJob(opts scheduleJobOptions) {
 	jobName := fmt.Sprintf("Scheduling job %d to run %v in %s", len(jobs), opts.GhCliCmd, opts.In)
 	fmt.Println(jobName)
 	jobs = append(jobs, jobName)
-	job, _ := scheduler.Every(opts.In).Do(func() {
+	scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
 		fmt.Println("Running job:", jobName)
 		gh(opts.GhCliCmd...)
 	})
-	job.LimitRunsTo(1)
 }
 
 func startScheduler() {
