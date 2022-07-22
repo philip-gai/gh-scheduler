@@ -2,6 +2,7 @@ package tui
 
 import (
 	"log"
+	"math"
 	"strings"
 
 	"github.com/gizak/termui/v3"
@@ -15,6 +16,8 @@ var console *widgets.List
 var logs *widgets.List
 var jobTable *widgets.Table
 var userInput string
+
+const scrollby = 6
 
 func Render() {
 	if err := termui.Init(); err != nil {
@@ -90,11 +93,22 @@ func startEventPolling() {
 			userInput = ""
 
 		// Scrolling events
-		case "<Down>":
-			logs.ScrollDown()
+		case "<Down>", "<MouseWheelUp>":
+			// utils.PushListRow("Scroll down", logs)
+			// if(logs.sr)
+			// logs.ScrollDown()
+			// utils.PushListRow(fmt.Sprintf("%d %d", logs.SelectedRow, len(logs.Rows)), logs)
+			// if logs.SelectedRow < len(logs.Rows)-scrollby-1 {
+			// 	logs.SelectedRow = logs.SelectedRow + scrollby
+			// } else {
+			// 	logs.SelectedRow = len(logs.Rows) - 1
+			// }
+			logs.SelectedRow = int(math.Min(float64(logs.SelectedRow+scrollby), float64(len(logs.Rows))))
 			termui.Render(logs)
-		case "<Up>":
-			logs.ScrollUp()
+		case "<Up>", "<MouseWheelDown>":
+			logs.SelectedRow = logs.SelectedRow - (int(math.Min(float64(logs.SelectedRow), scrollby)))
+			// utils.PushListRow("Scroll up", logs)
+			// logs.ScrollUp()
 			termui.Render(logs)
 		case "<C-d>":
 			logs.ScrollHalfPageDown()
