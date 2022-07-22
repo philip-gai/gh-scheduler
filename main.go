@@ -1,8 +1,8 @@
 package main
 
 import (
-	scheduler "github.com/philip-gai/gh-schedule/scheduler"
-	tui "github.com/philip-gai/gh-schedule/tui"
+	scheduler "github.com/philip-gai/gh-scheduler/scheduler"
+	tui "github.com/philip-gai/gh-scheduler/tui"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 
 	// TODO - replace with TUI
 
-	// fmt.Println("Welcome to gh-schedule!")
+	// fmt.Println("Welcome to gh-scheduler!")
 	// fmt.Println("Available Commands:\n * merge <pull_url> in <time_string>\n * Ctrl-C: Exits the scheduler")
 
 	// for {
@@ -35,7 +35,7 @@ func main() {
 	// 	} else {
 	// 		command := args[0]
 	// 		if command == "merge" {
-	// 			// Example: merge https://github.com/philip-gai/gh-schedule/pull/1 in 5s
+	// 			// Example: merge https://github.com/philip-gai/gh-scheduler/pull/1 in 5s
 	// 			opts := mergeOptions{}
 	// 			opts.PullUrl = args[1]
 	// 			opts.In = args[3]

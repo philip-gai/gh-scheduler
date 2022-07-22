@@ -6,7 +6,7 @@ import (
 
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/go-co-op/gocron"
-	gh "github.com/philip-gai/gh-schedule/gh"
+	gh "github.com/philip-gai/gh-scheduler/gh"
 )
 
 var scheduler *gocron.Scheduler

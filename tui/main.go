@@ -7,7 +7,7 @@ import (
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
-	"github.com/philip-gai/gh-schedule/scheduler"
+	"github.com/philip-gai/gh-scheduler/scheduler"
 )
 
 var grid *ui.Grid
@@ -98,7 +98,7 @@ func initializeGrid() {
 				} else {
 					command := args[0]
 					if command == "merge" {
-						// Example: merge https://github.com/philip-gai/gh-schedule/pull/1 in 5s
+						// Example: merge https://github.com/philip-gai/gh-scheduler/pull/1 in 5s
 						opts := mergeOptions{}
 						opts.PullUrl = args[1]
 						opts.In = args[3]
@@ -135,7 +135,7 @@ func createActionsSection() *widgets.Table {
 	actions.Title = "Actions"
 	actions.Rows = [][]string{
 		{"Action", "Example"},
-		{"Merge a pull request", "merge https://github.com/philip-gai/gh-schedule/pull/1 in 1h30m"},
+		{"Merge a pull request", "merge https://github.com/philip-gai/gh-scheduler/pull/1 in 1h30m"},
 	}
 	actions.TextAlignment = ui.AlignCenter
 	return actions
