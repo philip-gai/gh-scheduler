@@ -11,7 +11,6 @@ import (
 )
 
 var grid *termui.Grid
-var actions *widgets.Table
 var console *widgets.List
 var logs *widgets.List
 var jobTable *widgets.Table
@@ -23,7 +22,6 @@ func Render() {
 	}
 	defer termui.Close()
 
-	actions = createActionsSection()
 	console = createConsole()
 	logs = createLogsSection()
 	jobTable = createJobTable()
@@ -116,22 +114,10 @@ func initializeGrid() *termui.Grid {
 	grid.SetRect(0, 0, termWidth, termHeight)
 	grid.Set(
 		termui.NewRow(2.0/4, termui.NewCol(1.0, jobTable)),
-		termui.NewRow(1.0/4, termui.NewCol(1.0, actions)),
-		termui.NewRow(1.0/4, termui.NewCol(1.0/2, console), termui.NewCol(1.0/2, logs)),
+		termui.NewRow(2.0/4, termui.NewCol(1.0/2, console), termui.NewCol(1.0/2, logs)),
 	)
 	termui.Render(grid)
 	return grid
-}
-
-func createActionsSection() *widgets.Table {
-	actions := widgets.NewTable()
-	actions.Title = "Actions"
-	actions.Rows = [][]string{
-		{"Action", "Example"},
-		{"Merge a pull request", "pr merge https://github.com/philip-gai/gh-scheduler/pull/1 in 1h30m"},
-	}
-	actions.TextAlignment = termui.AlignCenter
-	return actions
 }
 
 func createJobTable() *widgets.Table {
