@@ -9,6 +9,12 @@ func main() {
 	scheduler.Start()
 	tui.Render()
 
+	// reader := bufio.NewReader(os.Stdin)
+	// fmt.Print("\nEnter command: ")
+	// text, _ := reader.ReadString('\n')
+	// text = strings.TrimRight(text, "\n")
+	// fmt.Println("Command:", text)
+
 	// TODO - replace with TUI
 
 	// fmt.Println("Welcome to gh-schedule!")

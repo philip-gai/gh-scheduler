@@ -3,7 +3,6 @@ package tui
 import (
 	"fmt"
 	"log"
-	"strings"
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
@@ -43,49 +42,6 @@ func Render() {
 	initializeGrid()
 }
 
-// func handleEvents() {
-// 	uiEvents := ui.PollEvents()
-// 	for {
-// 		e := <-uiEvents
-// 		switch e.ID {
-
-// 		// Exit on Escape or ctrl-c.
-// 		case "<Escape>", "<C-c>":
-// 			return
-
-// 		// Redraw grid on window resize
-// 		case "<Resize>":
-// 			payload := e.Payload.(ui.Resize)
-// 			grid.SetRect(0, 0, payload.Width, payload.Height)
-// 			ui.Clear()
-// 			ui.Render(grid)
-
-// 		// Action list navigation
-// 		case "<Down>":
-// 			actions.ScrollDown()
-// 		case "<Up>":
-// 			actions.ScrollUp()
-// 		case "<C-d>":
-// 			actions.ScrollHalfPageDown()
-// 		case "<C-u>":
-// 			actions.ScrollHalfPageUp()
-// 		case "<C-f>":
-// 			actions.ScrollPageDown()
-// 		case "<C-b>":
-// 			actions.ScrollPageUp()
-// 		case "<Home>":
-// 			actions.ScrollTop()
-// 		case "<End>":
-// 			actions.ScrollBottom()
-// 		case "<Enter>":
-// 			logs.Text += fmt.Sprintf("You selected: %s\n", actions.Rows[actions.SelectedRow])
-// 		default:
-// 			console.Text += e.ID
-// 		}
-// 		ui.Render(grid)
-// 	}
-// }
-
 func initializeGrid() {
 	grid = ui.NewGrid()
 	termWidth, termHeight := ui.TerminalDimensions()
@@ -94,10 +50,23 @@ func initializeGrid() {
 	// CurrentState = SelectAction
 	grid.Set(
 		ui.NewRow(3.0/4, ui.NewCol(1.0, actions)),
-		ui.NewRow(1.0/4, ui.NewCol(1.0/2, console), ui.NewCol(1.0, logs)),
+		ui.NewRow(1.0/4, ui.NewCol(1.0/2, console), ui.NewCol(1.0/2, logs)),
 	)
 	uiEvents := ui.PollEvents()
 	ui.Render(grid)
+
+	// listenForKeypress()
+
+	// scanner := bufio.NewScanner(os.Stdin)
+	// for scanner.Scan() {
+	// 	fmt.Println(scanner.Text())
+	// 	console.Text = scanner.Text()
+	// 	ui.Render(grid)
+	// }
+
+	// TODO - Check if alphanumeric characters are entered
+	// Check if space or backspace is entered
+	//
 	for {
 		e := <-uiEvents
 		switch e.ID {
@@ -106,41 +75,42 @@ func initializeGrid() {
 		case "<Escape>", "<C-c>":
 			return
 
-		// Redraw grid on window resize
-		case "<Resize>":
-			payload := e.Payload.(ui.Resize)
-			grid.SetRect(0, 0, payload.Width, payload.Height)
-			ui.Clear()
-			ui.Render(grid)
+			// 	// Redraw grid on window resize
+			// 	case "<Resize>":
+			// 		payload := e.Payload.(ui.Resize)
+			// 		grid.SetRect(0, 0, payload.Width, payload.Height)
+			// 		ui.Clear()
+			// 		ui.Render(grid)
 
-		case "<Enter>":
-			// Execute action
-			userInput = strings.TrimRight(userInput, "\n")
-			fmt.Println("Command:", userInput)
+			// 	case "<Enter>":
+			// 		// Execute action
+			// 		userInput = strings.TrimRight(userInput, "\n")
+			// 		fmt.Println("Command:", userInput)
 
-			if len(userInput) > 0 {
-				args := strings.Split(userInput, " ")
+			// 		if len(userInput) > 0 {
+			// 			args := strings.Split(userInput, " ")
 
-				if len(args) == 0 {
-					fmt.Println("Error: invalid arguments")
-				} else {
-					command := args[0]
-					if command == "merge" {
-						// Example: merge https://github.com/philip-gai/gh-schedule/pull/1 in 5s
-						opts := mergeOptions{}
-						opts.PullUrl = args[1]
-						opts.In = args[3]
-						runMerge(opts)
-					} else {
-						fmt.Println("Unknown command:", command)
-					}
-				}
-			}
-		default:
-			if e.Type == ui.KeyboardEvent && len(e.ID) == 1 && e.ID[0] != '<' {
-				console.Text += e.ID
-				userInput += e.ID
-			}
+			// 			if len(args) == 0 {
+			// 				fmt.Println("Error: invalid arguments")
+			// 			} else {
+			// 				command := args[0]
+			// 				if command == "merge" {
+			// 					// Example: merge https://github.com/philip-gai/gh-schedule/pull/1 in 5s
+			// 					opts := mergeOptions{}
+			// 					opts.PullUrl = args[1]
+			// 					opts.In = args[3]
+			// 					runMerge(opts)
+			// 				} else {
+			// 					fmt.Println("Unknown command:", command)
+			// 				}
+			// 			}
+			// 		}
+			// 	default:
+			// 		// fmt.Print(e.ID)
+			// 		if e.Type == ui.KeyboardEvent && len(e.ID) == 1 && e.ID[0] != '<' {
+			// 			console.Text += e.ID
+			// 			userInput += e.ID
+			// 		}
 		}
 		ui.Render(grid)
 	}
@@ -152,8 +122,9 @@ func createActionsSection() *widgets.Table {
 	actions.Title = "Actions"
 	actions.Rows = [][]string{
 		{"Action", "Example"},
-		{"Merge a pull request", "\"merge https://github.com/philip-gai/gh-schedule/pull/1 in 1h30m\""},
+		{"Merge a pull request", "merge https://github.com/philip-gai/gh-schedule/pull/1 in 1h30m"},
 	}
+	actions.TextAlignment = ui.AlignCenter
 	return actions
 }
 
@@ -180,16 +151,6 @@ func createConsole() *widgets.Paragraph {
 	console.Title = "Console"
 	return console
 }
-
-// func PopulateGrid() {
-// 	// Add widgets to grid and render
-// 	grid.Set(
-// 		// ui.NewRow(2.0/4, ui.NewCol(1.0, jobTable)),
-// 		ui.NewRow(1.0/4, ui.NewCol(1.0, actions)),
-// 		// ui.NewRow(1.0/4, ui.NewCol(1.0/2, console), ui.NewCol(1.0/2, logs)),
-// 	)
-// 	ui.Render(grid)
-// }
 
 func runMerge(opts mergeOptions) error {
 	fmt.Printf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In)
