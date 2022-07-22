@@ -107,12 +107,22 @@ func initializeGrid() {
 			// 				}
 			// 			}
 			// 		}
-			// 	default:
-			// 		// fmt.Print(e.ID)
-			// 		if e.Type == ui.KeyboardEvent && len(e.ID) == 1 && e.ID[0] != '<' {
-			// 			console.Text += e.ID
-			// 			userInput += e.ID
-			// 		}
+		default:
+			// This is the user regularly typing in the console
+			if e.Type == ui.KeyboardEvent {
+				if len(e.ID) == 1 {
+					userInput += e.ID
+					console.Text += e.ID
+				} else if e.ID == "<Backspace>" {
+					if userInput != "" {
+						console.Text = console.Text[:len(console.Text)-1]
+						userInput = userInput[:len(userInput)-1]
+					}
+				} else if e.ID == "<Space>" {
+					console.Text += " "
+					userInput += " "
+				}
+			}
 		}
 		ui.Render(grid)
 	}
