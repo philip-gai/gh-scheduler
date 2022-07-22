@@ -19,15 +19,16 @@ func gh(args ...string) (sout, eout bytes.Buffer, err error) {
 	}
 	fmt.Printf("gh %s\n", strings.Join(args, " "))
 	cmd := exec.Command(ghBin, args...)
-	cmd.Stderr = &eout
-	cmd.Stdout = &sout
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
 	err = cmd.Run()
-	if err != nil {
-		err = fmt.Errorf(eout.String())
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(sout)
+	// if err != nil {
+	// 	err = fmt.Errorf(eout.String())
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println(sout)
 	return
 }
 
