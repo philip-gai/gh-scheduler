@@ -78,12 +78,11 @@ func initializeGrid() {
 		case "<Escape>", "<C-c>":
 			return
 
-			// 	// Redraw grid on window resize
-			// 	case "<Resize>":
-			// 		payload := e.Payload.(ui.Resize)
-			// 		grid.SetRect(0, 0, payload.Width, payload.Height)
-			// 		ui.Clear()
-			// 		ui.Render(grid)
+		// Redraw grid on window resize
+		case "<Resize>":
+			payload := e.Payload.(ui.Resize)
+			grid.SetRect(0, 0, payload.Width, payload.Height)
+			ui.Clear()
 
 			// 	case "<Enter>":
 			// 		// Execute action
