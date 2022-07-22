@@ -13,6 +13,7 @@ var grid *ui.Grid
 var actions *widgets.Table
 var console *widgets.Paragraph
 var logs *widgets.Paragraph
+var jobTable *widgets.Table
 var userInput string
 
 var CurrentState State
@@ -39,6 +40,7 @@ func Render() {
 	actions = createActionsSection()
 	console = createConsole()
 	logs = createLogsSection()
+	jobTable = createJobTable()
 	initializeGrid()
 }
 
@@ -49,7 +51,8 @@ func initializeGrid() {
 	// Add widgets to grid and render
 	// CurrentState = SelectAction
 	grid.Set(
-		ui.NewRow(3.0/4, ui.NewCol(1.0, actions)),
+		ui.NewRow(2.0/4, ui.NewCol(1.0, jobTable)),
+		ui.NewRow(1.0/4, ui.NewCol(1.0, actions)),
 		ui.NewRow(1.0/4, ui.NewCol(1.0/2, console), ui.NewCol(1.0/2, logs)),
 	)
 	uiEvents := ui.PollEvents()
@@ -128,7 +131,7 @@ func createActionsSection() *widgets.Table {
 	return actions
 }
 
-func createJobTable() {
+func createJobTable() *widgets.Table {
 	// Job table
 	jobTable := widgets.NewTable()
 	jobTable.Title = "Jobs"
@@ -137,6 +140,7 @@ func createJobTable() {
 	}
 	jobTable.TextStyle = ui.NewStyle(ui.ColorWhite)
 	jobTable.TextAlignment = ui.AlignCenter
+	return jobTable
 }
 
 func createLogsSection() *widgets.Paragraph {
