@@ -13,9 +13,9 @@ type mergeOptions struct {
 }
 
 func runMerge(opts mergeOptions) error {
-	fmt.Printf("Scheduling merge of %s in %s", opts.PullUrl, opts.In)
+	fmt.Printf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In)
 	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
-	scheduleJob(scheduleJobOptions{
+	go scheduleJob(scheduleJobOptions{
 		In:       opts.In,
 		GhCliCmd: ghCliCmd,
 	})
@@ -31,7 +31,7 @@ func main() {
 	for {
 		// TODO - Press enter to exit, otherwise enter more schedule commands
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Enter command: ")
+		fmt.Print("\nEnter command: ")
 		text, _ := reader.ReadString('\n')
 		text = strings.TrimRight(text, "\n")
 		fmt.Println("Command:", text)

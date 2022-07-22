@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/cli/safeexec"
 )
@@ -16,14 +17,17 @@ func gh(args ...string) (sout, eout bytes.Buffer, err error) {
 		err = fmt.Errorf("could not find gh. Is it installed? error: %w", err)
 		return
 	}
+	fmt.Printf("gh %s\n", strings.Join(args, " "))
 	cmd := exec.Command(ghBin, args...)
 	cmd.Stderr = &eout
 	cmd.Stdout = &sout
 	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("failed to run gh. error: %w, stderr: %s", err, eout.String())
+		err = fmt.Errorf(eout.String())
+		fmt.Println(err)
 		return
 	}
+	fmt.Println(sout)
 	return
 }
 

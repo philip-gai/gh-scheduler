@@ -19,11 +19,17 @@ type scheduleJobOptions struct {
 
 func scheduleJob(opts scheduleJobOptions) {
 	jobName := fmt.Sprintf("%d: %v in %s", len(jobs), opts.GhCliCmd, opts.In)
-	fmt.Println(jobName)
+	fmt.Println("\n" + jobName)
 	jobs = append(jobs, jobName)
+	duration, err := time.ParseDuration(opts.In)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	time.Sleep(duration)
 	scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
 		fmt.Println("Running job:", jobName)
-		// gh(opts.GhCliCmd...)
+		gh(opts.GhCliCmd...)
 	})
 	scheduler.StartAsync()
 }
