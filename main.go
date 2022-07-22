@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
+	"bufio"gh-scheduler
+	"fmt"gh-scheduler
 	"os"
 	"strings"
 )
@@ -17,7 +17,7 @@ func runMerge(opts mergeOptions) error {
 	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
 	go scheduleJob(scheduleJobOptions{
 		In:       opts.In,
-		GhCliCmd: ghCliCmd,
+		GhCliCmd: ghCliCmd,gh-scheduler
 	})
 	return nil
 }
@@ -35,7 +35,7 @@ func main() {
 		text, _ := reader.ReadString('\n')
 		text = strings.TrimRight(text, "\n")
 		fmt.Println("Command:", text)
-
+gh-scheduler
 		args := strings.Split(text, " ")
 
 		if len(args) == 0 {

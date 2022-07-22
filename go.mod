@@ -1,4 +1,4 @@
-module github.com/philip-gai/gh-schedule
+module github.com/philip-gai/gh-scheduler
 
 go 1.18
 

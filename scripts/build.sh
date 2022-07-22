@@ -2,10 +2,10 @@
 
 set -e
 
-cd /workspaces/gh-schedule
+cd /workspaces/gh-scheduler
 
 go build
-gh extension remove gh-schedule &> /dev/null
+gh extension remove gh-scheduler &> /dev/null
 gh extension install .
 
 cd - > /dev/null
