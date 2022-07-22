@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gizak/termui/v3/widgets"
 	"github.com/go-co-op/gocron"
 	gh "github.com/philip-gai/gh-schedule/gh"
 )
@@ -18,18 +19,18 @@ type ScheduleJobOptions struct {
 	GhCliCmd []string
 }
 
-func ScheduleJob(opts ScheduleJobOptions) {
+func ScheduleJob(opts ScheduleJobOptions, logs *widgets.Paragraph) {
 	jobName := fmt.Sprintf("%d: %v in %s", len(jobs), opts.GhCliCmd, opts.In)
-	fmt.Println("\n" + jobName)
+	logs.Text += jobName
 	jobs = append(jobs, jobName)
 	duration, err := time.ParseDuration(opts.In)
 	if err != nil {
-		fmt.Println("Error:", err)
+		logs.Text += fmt.Sprintln("Error:", err)
 		return
 	}
 	time.Sleep(duration)
 	scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
-		fmt.Println("Running job:", jobName)
+		logs.Text += fmt.Sprintln("Running job:", jobName)
 		gh.Exec(opts.GhCliCmd...)
 	})
 	scheduler.StartAsync()

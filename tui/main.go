@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
@@ -84,29 +85,29 @@ func initializeGrid() {
 			grid.SetRect(0, 0, payload.Width, payload.Height)
 			ui.Clear()
 
-			// 	case "<Enter>":
-			// 		// Execute action
-			// 		userInput = strings.TrimRight(userInput, "\n")
-			// 		fmt.Println("Command:", userInput)
+		case "<Enter>":
+			// Execute action
+			userInput = strings.TrimRight(userInput, "\n")
+			fmt.Println("Command:", userInput)
 
-			// 		if len(userInput) > 0 {
-			// 			args := strings.Split(userInput, " ")
+			if len(userInput) > 0 {
+				args := strings.Split(userInput, " ")
 
-			// 			if len(args) == 0 {
-			// 				fmt.Println("Error: invalid arguments")
-			// 			} else {
-			// 				command := args[0]
-			// 				if command == "merge" {
-			// 					// Example: merge https://github.com/philip-gai/gh-schedule/pull/1 in 5s
-			// 					opts := mergeOptions{}
-			// 					opts.PullUrl = args[1]
-			// 					opts.In = args[3]
-			// 					runMerge(opts)
-			// 				} else {
-			// 					fmt.Println("Unknown command:", command)
-			// 				}
-			// 			}
-			// 		}
+				if len(args) == 0 {
+					fmt.Println("Error: invalid arguments")
+				} else {
+					command := args[0]
+					if command == "merge" {
+						// Example: merge https://github.com/philip-gai/gh-schedule/pull/1 in 5s
+						opts := mergeOptions{}
+						opts.PullUrl = args[1]
+						opts.In = args[3]
+						runMerge(opts)
+					} else {
+						fmt.Println("Unknown command:", command)
+					}
+				}
+			}
 		default:
 			// This is the user regularly typing in the console
 			if e.Type == ui.KeyboardEvent {
@@ -166,11 +167,11 @@ func createConsole() *widgets.Paragraph {
 }
 
 func runMerge(opts mergeOptions) error {
-	fmt.Printf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In)
+	logs.Text += fmt.Sprintf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In)
 	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
 	go scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
 		In:       opts.In,
 		GhCliCmd: ghCliCmd,
-	})
+	}, logs)
 	return nil
 }
