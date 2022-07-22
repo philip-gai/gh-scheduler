@@ -8,8 +8,6 @@ import (
 )
 
 var scheduler *gocron.Scheduler
-
-// Create messages string array
 var jobs = []string{}
 
 type scheduleJobOptions struct {
@@ -20,13 +18,14 @@ type scheduleJobOptions struct {
 }
 
 func scheduleJob(opts scheduleJobOptions) {
-	jobName := fmt.Sprintf("Scheduling job %d to run %v in %s", len(jobs), opts.GhCliCmd, opts.In)
+	jobName := fmt.Sprintf("%d: %v in %s", len(jobs), opts.GhCliCmd, opts.In)
 	fmt.Println(jobName)
 	jobs = append(jobs, jobName)
 	scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
 		fmt.Println("Running job:", jobName)
-		gh(opts.GhCliCmd...)
+		// gh(opts.GhCliCmd...)
 	})
+	scheduler.StartAsync()
 }
 
 func startScheduler() {
@@ -34,11 +33,5 @@ func startScheduler() {
 		// fmt.Println("Starting scheduler")
 		scheduler = gocron.NewScheduler(time.Local)
 		scheduler.StartAsync()
-		scheduler.Every("1m").Do(func() {
-			fmt.Println("\nScheduler is running")
-			fmt.Print("Enter command: ")
-		})
-	} else {
-		// fmt.Println("Scheduler already started")
 	}
 }
