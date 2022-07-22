@@ -65,7 +65,7 @@ func runCommand(userInput string) {
 		scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
 			In:       timeDuration,
 			GhCliCmd: ghCliArgs,
-		}, logs)
+		}, logs, jobTable)
 	}
 	utils.PushListRow("$ ", console)
 }
@@ -156,7 +156,7 @@ func createJobTable() *widgets.Table {
 	jobTable := widgets.NewTable()
 	jobTable.Title = "Jobs"
 	jobTable.Rows = [][]string{
-		{"Job", "Created", "Scheduled", "Status"},
+		{"#", "Action", "At", "Status"},
 	}
 	jobTable.TextStyle = termui.NewStyle(termui.ColorWhite)
 	jobTable.TextAlignment = termui.AlignCenter
