@@ -14,11 +14,9 @@ func PushListRow(text string, list *widgets.List) {
 
 func ConcatListRow(text string, list *widgets.List) {
 	list.Rows[len(list.Rows)-1] += text
-	list.ScrollBottom()
 }
 
 func BackspaceListRow(list *widgets.List) {
 	currentRow := list.Rows[len(list.Rows)-1]
 	list.Rows[len(list.Rows)-1] = currentRow[:len(currentRow)-1]
-	list.ScrollBottom()
 }

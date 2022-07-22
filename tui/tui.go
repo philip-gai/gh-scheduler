@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -42,29 +41,28 @@ func runCommand(userInput string) {
 	if len(userInput) > 0 {
 		args := strings.Split(userInput, " ")
 
-		if len(args) < 3 {
-			utils.PushListRow("Error: not enough arguments", logs)
-		} else {
-			timeDuration := args[len(args)-1]
-
-			// Remove scheduling info from command
-			ghCliArgs := args[:len(args)-2]
-
-			area := ghCliArgs[0]
-			command := ghCliArgs[1]
-
-			isValidArgs := true
-			isValidArgs = isValidArgs && area == "pr" && command == "merge" && len(ghCliArgs) >= 3
-
-			if isValidArgs {
-				scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
-					In:       timeDuration,
-					GhCliCmd: ghCliArgs,
-				}, logs)
-			} else {
-				utils.PushListRow(fmt.Sprintf("Error: unknown area or command \"%s %s\"", area, command), logs)
-			}
+		if args[0] == "gh" {
+			args = args[1:]
 		}
+
+		argLen := len(args)
+
+		if argLen == 0 {
+			utils.PushListRow("No command provided", logs)
+			return
+		} else if argLen < 3 {
+			utils.PushListRow("Command must contain \"<cmd> in <duration>\"", logs)
+			return
+		}
+		timeDuration := args[len(args)-1]
+
+		// Remove scheduling info from command
+		ghCliArgs := args[:len(args)-2]
+
+		scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
+			In:       timeDuration,
+			GhCliCmd: ghCliArgs,
+		}, logs)
 	}
 	utils.PushListRow("$ ", console)
 }
