@@ -5,27 +5,17 @@ import (
 	"log"
 	"strings"
 
-	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/philip-gai/gh-scheduler/scheduler"
 )
 
-var grid *ui.Grid
+var grid *termui.Grid
 var actions *widgets.Table
-var console *widgets.Paragraph
+var console *widgets.List
 var logs *widgets.Paragraph
 var jobTable *widgets.Table
 var userInput string
-
-var CurrentState State
-
-type State int64
-
-const (
-	SelectAction                State = 0
-	MergePull_PullRequestPrompt State = 1
-	MergePull_TimePrompt        State = 2
-)
 
 type mergeOptions struct {
 	PullUrl string
@@ -33,44 +23,69 @@ type mergeOptions struct {
 }
 
 func Render() {
-	if err := ui.Init(); err != nil {
+	if err := termui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
 	}
-	defer ui.Close()
+	defer termui.Close()
 
 	actions = createActionsSection()
 	console = createConsole()
 	logs = createLogsSection()
 	jobTable = createJobTable()
-	initializeGrid()
+	grid = initializeGrid()
+	startEventPolling()
 }
 
-func initializeGrid() {
-	grid = ui.NewGrid()
-	termWidth, termHeight := ui.TerminalDimensions()
-	grid.SetRect(0, 0, termWidth, termHeight)
-	// Add widgets to grid and render
-	// CurrentState = SelectAction
-	grid.Set(
-		ui.NewRow(2.0/4, ui.NewCol(1.0, jobTable)),
-		ui.NewRow(1.0/4, ui.NewCol(1.0, actions)),
-		ui.NewRow(1.0/4, ui.NewCol(1.0/2, console), ui.NewCol(1.0/2, logs)),
-	)
-	uiEvents := ui.PollEvents()
-	ui.Render(grid)
+func runCommand(userInput string) {
+	logs.Text += fmt.Sprintf("Running command \"%s\"\n", userInput)
 
-	// listenForKeypress()
+	// Execute action
+	userInput = strings.TrimRight(userInput, "\n")
 
-	// scanner := bufio.NewScanner(os.Stdin)
-	// for scanner.Scan() {
-	// 	fmt.Println(scanner.Text())
-	// 	console.Text = scanner.Text()
-	// 	ui.Render(grid)
-	// }
+	if len(userInput) > 0 {
+		args := strings.Split(userInput, " ")
 
-	// TODO - Check if alphanumeric characters are entered
-	// Check if space or backspace is entered
-	//
+		if len(args) == 0 {
+			logs.Text += fmt.Sprintln("Error: no commands given")
+		} else {
+			command := args[0]
+			if command == "merge" {
+				if len(args) == 3 {
+					opts := mergeOptions{}
+					opts.PullUrl = args[1]
+					opts.In = args[3]
+					runMerge(opts)
+				} else {
+					logs.Text += fmt.Sprintln("Error: not enough arguments")
+				}
+			} else {
+				logs.Text += fmt.Sprintf("Error: unknown command \"%s\"\n", command)
+			}
+		}
+	}
+	pushConsoleRow("$ ")
+	console.ScrollBottom()
+}
+
+func pushConsoleRow(text string) {
+	console.Rows = append(console.Rows, text)
+	termui.Render(console)
+}
+
+func appendToCurrentConsoleRow(text string) {
+	console.Rows[len(console.Rows)-1] += text
+	termui.Render(console)
+}
+
+func backspaceCurrentConsoleRow() {
+	currentRow := console.Rows[len(console.Rows)-1]
+	console.Rows[len(console.Rows)-1] = currentRow[:len(currentRow)-1]
+	termui.Render(console)
+}
+
+func startEventPolling() {
+	uiEvents := termui.PollEvents()
+
 	for {
 		e := <-uiEvents
 		switch e.ID {
@@ -81,63 +96,57 @@ func initializeGrid() {
 
 		// Redraw grid on window resize
 		case "<Resize>":
-			payload := e.Payload.(ui.Resize)
+			payload := e.Payload.(termui.Resize)
 			grid.SetRect(0, 0, payload.Width, payload.Height)
-			ui.Clear()
+			termui.Clear()
 
 		case "<Enter>":
-			// Execute action
-			userInput = strings.TrimRight(userInput, "\n")
-			fmt.Println("Command:", userInput)
+			runCommand(userInput)
+			userInput = ""
 
-			if len(userInput) > 0 {
-				args := strings.Split(userInput, " ")
-
-				if len(args) == 0 {
-					fmt.Println("Error: invalid arguments")
-				} else {
-					command := args[0]
-					if command == "merge" {
-						// Example: merge https://github.com/philip-gai/gh-scheduler/pull/1 in 5s
-						opts := mergeOptions{}
-						opts.PullUrl = args[1]
-						opts.In = args[3]
-						runMerge(opts)
-					} else {
-						fmt.Println("Unknown command:", command)
-					}
-				}
-			}
 		default:
 			// This is the user regularly typing in the console
-			if e.Type == ui.KeyboardEvent {
+			if e.Type == termui.KeyboardEvent {
 				if len(e.ID) == 1 {
+					appendToCurrentConsoleRow(e.ID)
 					userInput += e.ID
-					console.Text += e.ID
 				} else if e.ID == "<Backspace>" {
 					if userInput != "" {
-						console.Text = console.Text[:len(console.Text)-1]
+						backspaceCurrentConsoleRow()
 						userInput = userInput[:len(userInput)-1]
 					}
 				} else if e.ID == "<Space>" {
-					console.Text += " "
+					appendToCurrentConsoleRow(" ")
 					userInput += " "
 				}
 			}
 		}
-		ui.Render(grid)
+		// Rerender the grid on any event to make sure it's up to date
+		termui.Render(grid)
 	}
 }
 
+func initializeGrid() *termui.Grid {
+	grid := termui.NewGrid()
+	termWidth, termHeight := termui.TerminalDimensions()
+	grid.SetRect(0, 0, termWidth, termHeight)
+	grid.Set(
+		termui.NewRow(2.0/4, termui.NewCol(1.0, jobTable)),
+		termui.NewRow(1.0/4, termui.NewCol(1.0, actions)),
+		termui.NewRow(1.0/4, termui.NewCol(1.0/2, console), termui.NewCol(1.0/2, logs)),
+	)
+	termui.Render(grid)
+	return grid
+}
+
 func createActionsSection() *widgets.Table {
-	// List of actions to perform
 	actions := widgets.NewTable()
 	actions.Title = "Actions"
 	actions.Rows = [][]string{
 		{"Action", "Example"},
 		{"Merge a pull request", "merge https://github.com/philip-gai/gh-scheduler/pull/1 in 1h30m"},
 	}
-	actions.TextAlignment = ui.AlignCenter
+	actions.TextAlignment = termui.AlignCenter
 	return actions
 }
 
@@ -148,21 +157,25 @@ func createJobTable() *widgets.Table {
 	jobTable.Rows = [][]string{
 		{"Job", "Created", "Scheduled", "Status"},
 	}
-	jobTable.TextStyle = ui.NewStyle(ui.ColorWhite)
-	jobTable.TextAlignment = ui.AlignCenter
+	jobTable.TextStyle = termui.NewStyle(termui.ColorWhite)
+	jobTable.TextAlignment = termui.AlignCenter
 	return jobTable
 }
 
 func createLogsSection() *widgets.Paragraph {
-	logs = widgets.NewParagraph()
+	logs := widgets.NewParagraph()
 	logs.Title = "Logs"
 	return logs
 }
 
-func createConsole() *widgets.Paragraph {
+func createConsole() *widgets.List {
 	// Information and user input
-	console = widgets.NewParagraph()
+	console := widgets.NewList()
 	console.Title = "Console"
+	// console.Text = "$ "
+	console.Rows = []string{
+		"$ ",
+	}
 	return console
 }
 

@@ -13,8 +13,6 @@ var scheduler *gocron.Scheduler
 var jobs = []string{}
 
 type ScheduleJobOptions struct {
-	// At   string
-	// On 	string
 	In       string
 	GhCliCmd []string
 }
@@ -38,7 +36,6 @@ func ScheduleJob(opts ScheduleJobOptions, logs *widgets.Paragraph) {
 
 func Start() {
 	if scheduler == nil {
-		// fmt.Println("Starting scheduler")
 		scheduler = gocron.NewScheduler(time.Local)
 		scheduler.StartAsync()
 	}
