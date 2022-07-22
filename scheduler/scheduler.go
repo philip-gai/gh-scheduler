@@ -41,12 +41,15 @@ func ScheduleJob(opts ScheduleJobOptions, logs *widgets.List, jobTable *widgets.
 	jobs = append(jobs, jobInfo)
 	utils.PushJobRow(jobInfo, jobTable)
 	utils.PushListRow(fmt.Sprintf("Scheduled to run \"%s\" in %s", humanReadableArgs, opts.In), logs)
-	time.Sleep(duration)
-	scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
-		gh.Exec(logs, opts.GhCliCmd...)
-		jobInfo.Status = "Completed"
-		utils.UpdateJobRow(jobInfo, jobTable)
-	})
+
+	go func() {
+		time.Sleep(duration)
+		scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
+			gh.Exec(logs, opts.GhCliCmd...)
+			jobInfo.Status = "Completed"
+			utils.UpdateJobRow(jobInfo, jobTable)
+		})
+	}()
 }
 
 func Start() {
