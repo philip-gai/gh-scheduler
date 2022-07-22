@@ -84,9 +84,36 @@ func startEventPolling() {
 			grid.SetRect(0, 0, payload.Width, payload.Height)
 			termui.Render(grid)
 
+		// Run a command
 		case "<Enter>":
 			runCommand(userInput)
 			userInput = ""
+
+		// Scrolling events
+		case "<Down>":
+			logs.ScrollDown()
+			termui.Render(logs)
+		case "<Up>":
+			logs.ScrollUp()
+			termui.Render(logs)
+		case "<C-d>":
+			logs.ScrollHalfPageDown()
+			termui.Render(logs)
+		case "<C-u>":
+			logs.ScrollHalfPageUp()
+			termui.Render(logs)
+		case "<C-f>":
+			logs.ScrollPageDown()
+			termui.Render(logs)
+		case "<C-b>":
+			logs.ScrollPageUp()
+			termui.Render(logs)
+		case "<Home>":
+			logs.ScrollTop()
+			termui.Render(logs)
+		case "<End>":
+			logs.ScrollBottom()
+			termui.Render(logs)
 
 		default:
 			// This is the user regularly typing in the console
@@ -106,7 +133,6 @@ func startEventPolling() {
 				termui.Render(console)
 			}
 		}
-		// Rerender the grid on any event to make sure it's up to date
 	}
 }
 
