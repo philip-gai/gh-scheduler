@@ -177,5 +177,6 @@ func createConsole() *widgets.List {
 	console.Rows = []string{
 		"$ ",
 	}
+	console.WrapText = true
 	return console
 }

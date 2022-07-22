@@ -24,10 +24,5 @@ func Exec(logs *widgets.List, args ...string) (err error) {
 	outputString := string(output)
 	utils.PushListRow(outputString, logs)
 
-	if err != nil {
-		utils.PushListRow("Err is not nil", logs)
-		utils.PushListRow(fmt.Sprint("Error: ", err.Error()), logs)
-		return err
-	}
-	return nil
+	return err
 }
