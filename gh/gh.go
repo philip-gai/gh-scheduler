@@ -1,4 +1,4 @@
-package main
+package gh
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 // gh shells out to gh, connecting IO handles for user input
-func gh(args ...string) (err error) {
+func Exec(args ...string) (err error) {
 	ghBin, err := safeexec.LookPath("gh")
 	if err != nil {
 		err = fmt.Errorf("could not find gh. Is it installed? error: %w", err)
