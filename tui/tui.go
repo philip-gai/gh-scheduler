@@ -8,12 +8,13 @@ import (
 	"github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/philip-gai/gh-scheduler/scheduler"
+	"github.com/philip-gai/gh-scheduler/utils"
 )
 
 var grid *termui.Grid
 var actions *widgets.Table
 var console *widgets.List
-var logs *widgets.Paragraph
+var logs *widgets.List
 var jobTable *widgets.Table
 var userInput string
 
@@ -37,7 +38,8 @@ func Render() {
 }
 
 func runCommand(userInput string) {
-	logs.Text += fmt.Sprintf("Running command \"%s\"\n", userInput)
+	// Re-enable once we have debug logging
+	// utils.PushListRow(fmt.Sprintf("Running command \"%s\"", userInput), logs)
 
 	// Execute action
 	userInput = strings.TrimRight(userInput, "\n")
@@ -46,41 +48,24 @@ func runCommand(userInput string) {
 		args := strings.Split(userInput, " ")
 
 		if len(args) == 0 {
-			logs.Text += fmt.Sprintln("Error: no commands given")
+			utils.PushListRow("Error: no commands given", logs)
 		} else {
 			command := args[0]
 			if command == "merge" {
-				if len(args) == 3 {
+				if len(args) == 4 {
 					opts := mergeOptions{}
 					opts.PullUrl = args[1]
 					opts.In = args[3]
 					runMerge(opts)
 				} else {
-					logs.Text += fmt.Sprintln("Error: not enough arguments")
+					utils.PushListRow("Error: not enough arguments", logs)
 				}
 			} else {
-				logs.Text += fmt.Sprintf("Error: unknown command \"%s\"\n", command)
+				utils.PushListRow(fmt.Sprintf("Error: unknown command \"%s\"", command), logs)
 			}
 		}
 	}
-	pushConsoleRow("$ ")
-	console.ScrollBottom()
-}
-
-func pushConsoleRow(text string) {
-	console.Rows = append(console.Rows, text)
-	termui.Render(console)
-}
-
-func appendToCurrentConsoleRow(text string) {
-	console.Rows[len(console.Rows)-1] += text
-	termui.Render(console)
-}
-
-func backspaceCurrentConsoleRow() {
-	currentRow := console.Rows[len(console.Rows)-1]
-	console.Rows[len(console.Rows)-1] = currentRow[:len(currentRow)-1]
-	termui.Render(console)
+	utils.PushListRow("$ ", console)
 }
 
 func startEventPolling() {
@@ -108,15 +93,15 @@ func startEventPolling() {
 			// This is the user regularly typing in the console
 			if e.Type == termui.KeyboardEvent {
 				if len(e.ID) == 1 {
-					appendToCurrentConsoleRow(e.ID)
+					utils.ConcatListRow(e.ID, console)
 					userInput += e.ID
 				} else if e.ID == "<Backspace>" {
 					if userInput != "" {
-						backspaceCurrentConsoleRow()
+						utils.BackspaceListRow(console)
 						userInput = userInput[:len(userInput)-1]
 					}
 				} else if e.ID == "<Space>" {
-					appendToCurrentConsoleRow(" ")
+					utils.ConcatListRow(" ", console)
 					userInput += " "
 				}
 			}
@@ -162,8 +147,8 @@ func createJobTable() *widgets.Table {
 	return jobTable
 }
 
-func createLogsSection() *widgets.Paragraph {
-	logs := widgets.NewParagraph()
+func createLogsSection() *widgets.List {
+	logs := widgets.NewList()
 	logs.Title = "Logs"
 	return logs
 }
@@ -172,7 +157,6 @@ func createConsole() *widgets.List {
 	// Information and user input
 	console := widgets.NewList()
 	console.Title = "Console"
-	// console.Text = "$ "
 	console.Rows = []string{
 		"$ ",
 	}
@@ -180,9 +164,9 @@ func createConsole() *widgets.List {
 }
 
 func runMerge(opts mergeOptions) error {
-	logs.Text += fmt.Sprintf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In)
+	utils.PushListRow(fmt.Sprintf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In), logs)
 	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
-	go scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
+	scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
 		In:       opts.In,
 		GhCliCmd: ghCliCmd,
 	}, logs)
