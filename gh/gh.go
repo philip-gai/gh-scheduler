@@ -2,28 +2,31 @@ package gh
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/cli/safeexec"
+	"github.com/gizak/termui/v3/widgets"
+	"github.com/philip-gai/gh-scheduler/utils"
 )
 
 // gh shells out to gh, connecting IO handles for user input
-func Exec(args ...string) (err error) {
+func Exec(logs *widgets.List, args ...string) (err error) {
 	ghBin, err := safeexec.LookPath("gh")
 	if err != nil {
 		err = fmt.Errorf("could not find gh. Is it installed? error: %w", err)
 		return
 	}
-	fmt.Printf("gh %s\n", strings.Join(args, " "))
-	cmd := exec.Command(ghBin, args...)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	err = cmd.Run()
+	humanReadableArgs := fmt.Sprintf("gh %s", strings.Join(args, " "))
+	utils.PushListRow(humanReadableArgs, logs)
+	output, err := exec.Command(ghBin, args...).CombinedOutput()
+
+	outputString := string(output)
+	utils.PushListRow(outputString, logs)
+
 	if err != nil {
-		fmt.Println(err)
+		utils.PushListRow("Err is not nil", logs)
+		utils.PushListRow(fmt.Sprint("Error: ", err.Error()), logs)
 		return err
 	}
 	return nil

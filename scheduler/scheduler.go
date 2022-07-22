@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gizak/termui/v3/widgets"
@@ -19,18 +20,18 @@ type ScheduleJobOptions struct {
 }
 
 func ScheduleJob(opts ScheduleJobOptions, logs *widgets.List) {
-	jobName := fmt.Sprintf("%d: %v in %s", len(jobs), opts.GhCliCmd, opts.In)
-	utils.PushListRow(jobName, logs)
+	humanReadableArgs := fmt.Sprintf("gh %s", strings.Join(opts.GhCliCmd, " "))
+	jobName := fmt.Sprintf("%d: %s in %s", len(jobs), humanReadableArgs, opts.In)
 	jobs = append(jobs, jobName)
 	duration, err := time.ParseDuration(opts.In)
 	if err != nil {
-		utils.PushListRow(fmt.Sprintln("Error:", err), logs)
+		utils.PushListRow(fmt.Sprint("Error:", err), logs)
 		return
 	}
+	utils.PushListRow(fmt.Sprintf("Scheduled to run \"%s\" in %s", humanReadableArgs, opts.In), logs)
 	time.Sleep(duration)
 	scheduler.Every(opts.In).LimitRunsTo(1).Do(func() {
-		utils.PushListRow(fmt.Sprintln("Running job:", jobName), logs)
-		gh.Exec(opts.GhCliCmd...)
+		gh.Exec(logs, opts.GhCliCmd...)
 	})
 	scheduler.StartAsync()
 }

@@ -18,11 +18,6 @@ var logs *widgets.List
 var jobTable *widgets.Table
 var userInput string
 
-type mergeOptions struct {
-	PullUrl string
-	In      string
-}
-
 func Render() {
 	if err := termui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
@@ -47,21 +42,27 @@ func runCommand(userInput string) {
 	if len(userInput) > 0 {
 		args := strings.Split(userInput, " ")
 
-		if len(args) == 0 {
-			utils.PushListRow("Error: no commands given", logs)
+		if len(args) < 3 {
+			utils.PushListRow("Error: not enough arguments", logs)
 		} else {
-			command := args[0]
-			if command == "merge" {
-				if len(args) == 4 {
-					opts := mergeOptions{}
-					opts.PullUrl = args[1]
-					opts.In = args[3]
-					runMerge(opts)
-				} else {
-					utils.PushListRow("Error: not enough arguments", logs)
-				}
+			timeDuration := args[len(args)-1]
+
+			// Remove scheduling info from command
+			ghCliArgs := args[:len(args)-2]
+
+			area := ghCliArgs[0]
+			command := ghCliArgs[1]
+
+			isValidArgs := true
+			isValidArgs = isValidArgs && area == "pr" && command == "merge" && len(ghCliArgs) >= 3
+
+			if isValidArgs {
+				scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
+					In:       timeDuration,
+					GhCliCmd: ghCliArgs,
+				}, logs)
 			} else {
-				utils.PushListRow(fmt.Sprintf("Error: unknown command \"%s\"", command), logs)
+				utils.PushListRow(fmt.Sprintf("Error: unknown area or command \"%s %s\"", area, command), logs)
 			}
 		}
 	}
@@ -129,7 +130,7 @@ func createActionsSection() *widgets.Table {
 	actions.Title = "Actions"
 	actions.Rows = [][]string{
 		{"Action", "Example"},
-		{"Merge a pull request", "merge https://github.com/philip-gai/gh-scheduler/pull/1 in 1h30m"},
+		{"Merge a pull request", "pr merge https://github.com/philip-gai/gh-scheduler/pull/1 in 1h30m"},
 	}
 	actions.TextAlignment = termui.AlignCenter
 	return actions
@@ -150,6 +151,7 @@ func createJobTable() *widgets.Table {
 func createLogsSection() *widgets.List {
 	logs := widgets.NewList()
 	logs.Title = "Logs"
+	logs.WrapText = true
 	return logs
 }
 
@@ -161,14 +163,4 @@ func createConsole() *widgets.List {
 		"$ ",
 	}
 	return console
-}
-
-func runMerge(opts mergeOptions) error {
-	utils.PushListRow(fmt.Sprintf("Scheduling merge of %s in %s\n", opts.PullUrl, opts.In), logs)
-	ghCliCmd := []string{"pr", "merge", opts.PullUrl}
-	scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
-		In:       opts.In,
-		GhCliCmd: ghCliCmd,
-	}, logs)
-	return nil
 }
