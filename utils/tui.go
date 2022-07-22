@@ -2,14 +2,17 @@
 package utils
 
 import (
+	"strings"
+
 	"github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 )
 
 func PushListRow(text string, list *widgets.List) {
-	list.Rows = append(list.Rows, text)
-	termui.Render(list)
+	textRows := strings.Split(text, "\n")
+	list.Rows = append(list.Rows, textRows...)
 	list.ScrollBottom()
+	termui.Render(list)
 }
 
 func ConcatListRow(text string, list *widgets.List) {

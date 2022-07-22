@@ -47,9 +47,11 @@ func runCommand(userInput string) {
 
 		if argLen == 0 {
 			utils.PushListRow("No command provided", logs)
+			utils.PushListRow("$ ", console)
 			return
 		} else if argLen < 3 {
 			utils.PushListRow("Command must contain \"<cmd> in <duration>\"", logs)
+			utils.PushListRow("$ ", console)
 			return
 		}
 		timeDuration := args[len(args)-1]
@@ -80,7 +82,7 @@ func startEventPolling() {
 		case "<Resize>":
 			payload := e.Payload.(termui.Resize)
 			grid.SetRect(0, 0, payload.Width, payload.Height)
-			termui.Clear()
+			termui.Render(grid)
 
 		case "<Enter>":
 			runCommand(userInput)
@@ -101,10 +103,10 @@ func startEventPolling() {
 					utils.ConcatListRow(" ", console)
 					userInput += " "
 				}
+				termui.Render(console)
 			}
 		}
 		// Rerender the grid on any event to make sure it's up to date
-		termui.Render(grid)
 	}
 }
 
