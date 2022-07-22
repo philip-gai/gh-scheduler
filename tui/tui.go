@@ -94,21 +94,10 @@ func startEventPolling() {
 
 		// Scrolling events
 		case "<Down>", "<MouseWheelUp>":
-			// utils.PushListRow("Scroll down", logs)
-			// if(logs.sr)
-			// logs.ScrollDown()
-			// utils.PushListRow(fmt.Sprintf("%d %d", logs.SelectedRow, len(logs.Rows)), logs)
-			// if logs.SelectedRow < len(logs.Rows)-scrollby-1 {
-			// 	logs.SelectedRow = logs.SelectedRow + scrollby
-			// } else {
-			// 	logs.SelectedRow = len(logs.Rows) - 1
-			// }
 			logs.SelectedRow = int(math.Min(float64(logs.SelectedRow+scrollby), float64(len(logs.Rows))))
 			termui.Render(logs)
 		case "<Up>", "<MouseWheelDown>":
 			logs.SelectedRow = logs.SelectedRow - (int(math.Min(float64(logs.SelectedRow), scrollby)))
-			// utils.PushListRow("Scroll up", logs)
-			// logs.ScrollUp()
 			termui.Render(logs)
 		case "<C-d>":
 			logs.ScrollHalfPageDown()
