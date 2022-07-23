@@ -1,8 +1,11 @@
-name: release
+name: Release
+
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch: {}
+
 permissions:
   contents: write
 
@@ -10,5 +13,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: cli/gh-extension-precompile@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Precompile the go executable
+        uses: cli/gh-extension-precompile@v1
