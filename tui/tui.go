@@ -52,15 +52,18 @@ func runCommand(userInput string) {
 			utils.PushListRow("No command provided", logs)
 			utils.PushListRow("$ ", console)
 			return
-		} else if argLen < 3 {
-			utils.PushListRow("Command must contain \"<cmd> in <duration>\"", logs)
-			utils.PushListRow("$ ", console)
-			return
 		}
-		timeDuration := args[len(args)-1]
 
-		// Remove scheduling info from command
-		ghCliArgs := args[:len(args)-2]
+		hasTime := len(args) >= 2 && args[len(args)-2] == "in"
+		timeDuration := "0"
+
+		ghCliArgs := args
+
+		if hasTime {
+			timeDuration = args[len(args)-1]
+			// Remove scheduling info from command
+			ghCliArgs = args[:len(args)-2]
+		}
 
 		scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
 			In:       timeDuration,
