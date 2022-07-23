@@ -164,6 +164,7 @@ func createJobTable() *widgets.Table {
 	}
 	jobTable.TextStyle = termui.NewStyle(termui.ColorWhite)
 	jobTable.TextAlignment = termui.AlignCenter
+	jobTable.BorderStyle = termui.NewStyle(termui.ColorGreen)
 	return jobTable
 }
 
@@ -171,6 +172,7 @@ func createLogsSection() *widgets.List {
 	logs := widgets.NewList()
 	logs.Title = "Logs"
 	logs.WrapText = true
+	logs.BorderStyle = termui.NewStyle(termui.ColorGreen)
 	utils.PushListRow("✨✨✨✨✨✨✨✨✨✨", logs)
 	utils.PushListRow("Thanks for using the gh-scheduler!", logs)
 	utils.PushListRow("Don't know where to start?\nHere's an example 👉 \"gh pr merge <url> in 1h\"", logs)
@@ -187,6 +189,7 @@ func createConsole() *widgets.List {
 	console.Rows = []string{
 		"$ ",
 	}
+	console.BorderStyle = termui.NewStyle(termui.ColorYellow)
 	console.WrapText = true
 	return console
 }
