@@ -9,6 +9,8 @@ import (
 	"github.com/gizak/termui/v3/widgets"
 )
 
+var JobTableHeader = []string{"#", "Action", "At", "Status"}
+
 func PushListRow(text string, list *widgets.List) {
 	textRows := strings.Split(text, "\n")
 	list.Rows = append(list.Rows, textRows...)
@@ -26,16 +28,23 @@ func BackspaceListRow(list *widgets.List) {
 }
 
 func PushJobRow(job JobInfo, jobTable *widgets.Table) {
-	jobTable.Rows = append(jobTable.Rows, []string{
-		fmt.Sprintf("%d", job.ID),
-		job.Action,
-		job.ScheduledFor,
-		job.Status,
-	})
+	jobTableEntry := [][]string{
+		JobTableHeader,
+		{
+			fmt.Sprintf("%d", job.ID),
+			job.Action,
+			job.ScheduledFor,
+			job.Status,
+		}}
+	if len(jobTable.Rows) > 1 {
+		jobTable.Rows = append(jobTableEntry, jobTable.Rows[1:]...)
+	} else {
+		jobTable.Rows = jobTableEntry
+	}
 	termui.Render(jobTable)
 }
 
 func UpdateJobRow(job JobInfo, jobTable *widgets.Table) {
-	jobTable.Rows[job.ID][3] = job.Status
+	jobTable.Rows[len(jobTable.Rows)-job.ID][3] = job.Status
 	termui.Render(jobTable)
 }

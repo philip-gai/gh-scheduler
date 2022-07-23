@@ -160,7 +160,7 @@ func createJobTable() *widgets.Table {
 	jobTable := widgets.NewTable()
 	jobTable.Title = "Jobs"
 	jobTable.Rows = [][]string{
-		{"#", "Action", "At", "Status"},
+		utils.JobTableHeader,
 	}
 	jobTable.TextStyle = termui.NewStyle(termui.ColorWhite)
 	jobTable.TextAlignment = termui.AlignCenter
