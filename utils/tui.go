@@ -36,6 +36,6 @@ func PushJobRow(job JobInfo, jobTable *widgets.Table) {
 }
 
 func UpdateJobRow(job JobInfo, jobTable *widgets.Table) {
-	jobTable.Rows[job.ID-1][3] = job.Status
+	jobTable.Rows[job.ID][3] = job.Status
 	termui.Render(jobTable)
 }
