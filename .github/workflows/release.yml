@@ -1,4 +1,4 @@
-name: Release
+name: Release 🚢
 
 on:
   push:
@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
