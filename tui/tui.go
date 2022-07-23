@@ -171,6 +171,12 @@ func createLogsSection() *widgets.List {
 	logs := widgets.NewList()
 	logs.Title = "Logs"
 	logs.WrapText = true
+	utils.PushListRow("✨✨✨✨✨✨✨✨✨✨", logs)
+	utils.PushListRow("Thanks for using the gh-scheduler!", logs)
+	utils.PushListRow("Don't know where to start?\nHere's an example 👉 \"gh pr merge <url> in 1h\"", logs)
+	utils.PushListRow("This schedules a pull request to be automatically merged in an hour!", logs)
+	utils.PushListRow("✨✨✨✨✨✨✨✨✨✨", logs)
+	logs.SelectedRow = 0
 	return logs
 }
 
