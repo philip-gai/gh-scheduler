@@ -88,6 +88,7 @@ func startEventPolling() {
 		case "<Resize>":
 			payload := e.Payload.(termui.Resize)
 			grid.SetRect(0, 0, payload.Width, payload.Height)
+			termui.Clear()
 			termui.Render(grid)
 
 		// Run a command
