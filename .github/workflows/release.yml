@@ -16,5 +16,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Precompile the go executable
-        uses: cli/gh-extension-precompile@v1
+      - name: Release the extension
+        uses: cli/gh-extension-precompile@v1.2.1
+        with:
+          go_version: "1.18.3"
