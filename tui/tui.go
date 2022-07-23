@@ -55,7 +55,7 @@ func runCommand(userInput string) {
 		}
 
 		hasTime := len(args) >= 2 && args[len(args)-2] == "in"
-		timeDuration := "0"
+		timeDuration := "0s"
 
 		ghCliArgs := args
 
