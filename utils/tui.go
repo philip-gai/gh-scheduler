@@ -14,7 +14,7 @@ var JobTableHeader = []string{"#", "Action", "At", "Status"}
 func PushListRow(text string, list *widgets.List) {
 	textRows := strings.Split(text, "\n")
 	list.Rows = append(list.Rows, textRows...)
-	list.ScrollBottom()
+	list.SelectedRow = len(list.Rows) - 1
 	termui.Render(list)
 }
 
