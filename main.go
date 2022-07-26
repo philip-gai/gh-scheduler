@@ -2,10 +2,10 @@ package main
 
 import (
 	scheduler "github.com/philip-gai/gh-scheduler/scheduler"
-	ui "github.com/philip-gai/gh-scheduler/ui"
+	dashboard "github.com/philip-gai/gh-scheduler/ui/views"
 )
 
 func main() {
 	scheduler.Start()
-	ui.Render()
+	dashboard.Init()
 }
