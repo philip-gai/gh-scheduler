@@ -4,11 +4,12 @@ import (
 	"log"
 	"math"
 	"strings"
-
 	"github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/philip-gai/gh-scheduler/scheduler"
 	"github.com/philip-gai/gh-scheduler/utils"
+
+	// tea "github.com/charmbracelet/bubbletea"
 )
 
 var grid *termui.Grid
