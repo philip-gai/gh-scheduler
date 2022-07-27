@@ -10,6 +10,7 @@ import (
 // https://github.com/charmbracelet/bubbletea/tree/master/tutorials/basics
 // https://github.com/charmbracelet/bubbles
 // https://www.inngest.com/blog/interactive-clis-with-bubbletea
+// https://github.com/dlvhdr/gh-dash/blob/main/ui/ui.go
 
 func Init() {
 	p := tea.NewProgram(textinput.InitialModel())
