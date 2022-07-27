@@ -1,4 +1,4 @@
-package components
+package textinput
 
 // A simple program demonstrating the text input component from the Bubbles
 // component library.
@@ -18,7 +18,7 @@ type Model struct {
 	err       error
 }
 
-func InitialModel() Model {
+func New() tea.Model {
 	ti := textinput.New()
 	ti.Placeholder = "gh pr merge <url> in 1h"
 	ti.Focus()
@@ -39,8 +39,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
-		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
+		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
+		case tea.KeyEnter:
+
 		}
 
 	// We handle errors just like any other message
@@ -60,3 +62,44 @@ func (m Model) View() string {
 		"(esc to quit)",
 	) + "\n"
 }
+
+// func runCommand(m Model) {
+// 	// Re-enable once we have debug logging
+// 	// utils.PushListRow(fmt.Sprintf("Running command \"%s\"", userInput), logs)
+
+// 	// Execute action
+// 	userInput := m.textInput.Value()
+
+// 	if len(userInput) > 0 {
+// 		args := strings.Split(userInput, " ")
+
+// 		if args[0] == "gh" {
+// 			args = args[1:]
+// 		}
+
+// 		argLen := len(args)
+
+// 		if argLen == 0 {
+// 			utils.PushListRow("No command provided", logs)
+// 			utils.PushListRow("$ ", console)
+// 			return
+// 		}
+
+// 		hasTime := len(args) >= 2 && args[len(args)-2] == "in"
+// 		timeDuration := "0s"
+
+// 		ghCliArgs := args
+
+// 		if hasTime {
+// 			timeDuration = args[len(args)-1]
+// 			// Remove scheduling info from command
+// 			ghCliArgs = args[:len(args)-2]
+// 		}
+
+// 		scheduler.ScheduleJob(scheduler.ScheduleJobOptions{
+// 			In:       timeDuration,
+// 			GhCliCmd: ghCliArgs,
+// 		}, logs, jobTable)
+// 	}
+// 	utils.PushListRow("$ ", console)
+// }

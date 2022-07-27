@@ -4,7 +4,7 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
-	textinput "github.com/philip-gai/gh-scheduler/ui/components"
+	"github.com/philip-gai/gh-scheduler/ui/components/textinput"
 )
 
 // https://github.com/charmbracelet/bubbletea/tree/master/tutorials/basics
@@ -13,7 +13,7 @@ import (
 // https://github.com/dlvhdr/gh-dash/blob/main/ui/ui.go
 
 func Init() {
-	p := tea.NewProgram(textinput.InitialModel())
+	p := tea.NewProgram(textinput.New())
 
 	if err := p.Start(); err != nil {
 		log.Fatal(err)
