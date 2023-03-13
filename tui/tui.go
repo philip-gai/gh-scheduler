@@ -175,7 +175,7 @@ func createLogsSection() *widgets.List {
 	logs.BorderStyle = termui.NewStyle(termui.ColorGreen)
 	utils.PushListRow("✨✨✨✨✨✨✨✨✨✨", logs)
 	utils.PushListRow("Thanks for using the gh-scheduler!", logs)
-	utils.PushListRow("Don't know where to start?\nHere's an example 👉 \"gh pr merge <url> in 1h\"", logs)
+	utils.PushListRow("Don't know where to start?\nHere's an example 👉 \"gh pr merge <url> --auto --squash in 1h\"", logs)
 	utils.PushListRow("This schedules a pull request to be automatically merged in an hour!", logs)
 	utils.PushListRow("✨✨✨✨✨✨✨✨✨✨", logs)
 	logs.SelectedRow = 0
